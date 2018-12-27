@@ -8,28 +8,28 @@ URL: https://github.com/hadley/adv-r
 Depends: 
     R (>= 3.1.0)
 Imports: 
-    bench,
     bookdown,
     dbplyr,
-    desc,
     emo,
-    ggbeeswarm,
     ggplot2,
+    inline,
     knitr,
+    lineprof,
     lobstr,
     memoise,
-    profvis,
+    microbenchmark,
+    png,
+    pryr,
     Rcpp,
-    rlang (>= 0.3.0),
+    rlang,
     rmarkdown,
     RSQLite,
-    scales (>= 1.0.0),
-    sessioninfo,
     sloop,
-    testthat,
-    tidyr,
-    vctrs,
+    stringr,
     zeallot
 Remotes: 
     hadley/emo,
+    hadley/lineprof,
+    hadley/lobstr,
+    hadley/sloop,
     r-lib/rlang

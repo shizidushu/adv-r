@@ -1,14 +1,12 @@
 library(methods)
-set.seed(1014)
 
-# options(lifecycle_warnings_as_errors = TRUE)
+set.seed(1014)
+options(digits = 3)
 
 knitr::opts_chunk$set(
   comment = "#>",
   collapse = TRUE,
   cache = TRUE,
-  fig.retina = 0.8, # figures are either vectors or 300 dpi diagrams
-  dpi = 300,
   out.width = "70%",
   fig.align = 'center',
   fig.width = 6,
@@ -16,19 +14,23 @@ knitr::opts_chunk$set(
   fig.show = "hold"
 )
 
-options(rlang_trace_top_env = rlang::current_env())
-
-options(
-  digits = 3,
-  str = strOptions(strict.width = "cut")
-)
-
-if (knitr::is_latex_output()) {
-  knitr::opts_chunk$set(width = 69)
-  options(width = 69)
-  options(crayon.enabled = FALSE)
-  options(cli.unicode = TRUE)
-}
+# options("crayon.enabled" = TRUE, "crayon.colors" = 256L)
+# crayon::num_colors(TRUE)
+#
+# colourise_chunk <- function(x, options) {
+#   fence = paste(rep("`", 3), collapse = '')
+#
+#   x = gsub(paste0('[\n]{2,}(', fence, '|    )'), '\n\n\\1', x)
+#   x = gsub('[\n]+$', '', x)
+#   x = gsub('^[\n]+', '\n', x)
+#   if (isTRUE(options$collapse)) {
+#     x = gsub(paste0('\n([', fence_char, ']{3,})\n+\\1(', tolower(options$engine), ')?\n'), "\n", x)
+#   }
+#   x <- ansistrings::ansi_to_html(x, fullpage = FALSE)
+#
+#   if (is.null(s <- options$indent)) return(x)
+#   line_prompt(x, prompt = s, continue = s)
+# }
 
 knitr::knit_hooks$set(
   small_mar = function(before, options, envir) {
@@ -36,25 +38,31 @@ knitr::knit_hooks$set(
       par(mar = c(4.1, 4.1, 0.5, 0.5))
     }
   }
+  # chunk = colourise_chunk
 )
 
-# Make error messages closer to base R
-registerS3method("wrap", "error", envir = asNamespace("knitr"),
-  function(x, options) {
-    call <- conditionCall(x)
-    message <- conditionMessage(x)
+# Previously in oldbookdown -----------------------------------------------
 
-    width <- getOption("width")
-    if (nchar(message) > width && !grepl("\n", message)) {
-      message <- paste(strwrap(x, width = width, exdent = 2), collapse = "\n")
-    }
+doc_type <- function() knitr::opts_knit$get('rmarkdown.pandoc.to')
 
-    if (is.null(call)) {
-      msg <- paste0("Error: ", message)
-    } else {
-      msg <- paste0("Error in ", deparse(call)[[1]], ":\n  ", message)
-    }
+begin_sidebar <- function(title = NULL) {
+  if (identical(doc_type(), "latex")) {
+    # Suppress sidebars for now - pandoc doesn't convert markdown inside
+    # a latex environment, so this technique required post-processing,
+    # and I don't want to bother with that until I start building the
+    # final block
 
-    knitr:::msg_wrap(msg, "error", options)
+    # knitr::asis_output(paste0("\\begin{SIDEBAR}", title, "\\end{SIDEBAR}\n"))
+  } else {
+    knitr::asis_output(paste0("<div class = 'sidebar'><h3>", title, "</h3>\n\n"))
   }
-)
+}
+
+end_sidebar <- function() {
+  if (identical(doc_type(), "latex")) {
+    # knitr::asis_output("\\begin{ENDSIDEBAR}\\end{ENDSIDEBAR}\n")
+  } else {
+    knitr::asis_output("</div>\n")
+  }
+}
+
